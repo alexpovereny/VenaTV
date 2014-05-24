@@ -1392,6 +1392,14 @@ function wp_insert_user( $userdata ) {
 
 	if ( empty($show_admin_bar_front) )
 		$show_admin_bar_front = 'true';
+        
+        if ( empty($liverail_user_id) )
+		$liverail_user_id = '';
+	$liverail_user_id = apply_filters('pre_liverail_user_id', $liverail_user_id);
+        
+        if ( empty($liverail_entity_id) )
+		$liverail_entity_id = '';
+	$liverail_entity_id = apply_filters('pre_liverail_entity_id', $liverail_entity_id);
 
 	$user_nicename_check = $wpdb->get_var( $wpdb->prepare("SELECT ID FROM $wpdb->users WHERE user_nicename = %s AND user_login != %s LIMIT 1" , $user_nicename, $user_login));
 
@@ -1405,7 +1413,7 @@ function wp_insert_user( $userdata ) {
 		$user_nicename = $alt_user_nicename;
 	}
 
-	$data = compact( 'user_pass', 'user_email', 'user_url', 'user_nicename', 'display_name', 'user_registered' );
+	$data = compact( 'user_pass', 'user_email', 'user_url', 'user_nicename', 'display_name', 'user_registered', 'liverail_user_id', 'liverail_entity_id' );
 	$data = wp_unslash( $data );
 
 	if ( $update ) {

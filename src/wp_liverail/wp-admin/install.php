@@ -41,6 +41,9 @@ require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 /** Load wpdb */
 require_once( ABSPATH . 'wp-includes/wp-db.php' );
 
+/** Load lrapi LiveRailApi */
+require_once( ABSPATH . 'wp-includes/liverailapi.php' );
+
 $step = isset( $_GET['step'] ) ? (int) $_GET['step'] : 0;
 
 /**

@@ -202,7 +202,7 @@ function apply_filters( $tag, $value ) {
 	} while ( next($wp_filter[$tag]) !== false );
 
 	array_pop( $wp_current_filter );
-
+       // var_dump($the_['accepted_args']);
 	return $value;
 }
 

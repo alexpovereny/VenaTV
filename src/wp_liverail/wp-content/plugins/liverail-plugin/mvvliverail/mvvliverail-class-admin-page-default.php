@@ -259,49 +259,50 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
           echo '<br> 1  $msRows -<br>';
           var_dump($msRows);
           echo '<br> --- $total=' . $total; */
+        if ($msRows) {
+            foreach ($msRows as $key => $msRow) {
+                //  echo '<br> 2  $msRow -<br>';
+                //  var_dump($msRow);
+                //  echo '<br> -- $msRow->entity_id ---' . $msRow->entity_id;
+                // echo '<br> $myRows -<br>';
+                // var_dump($myRows);
+                /* if (!array_key_exists('"'.$msRow->entity_id.'"', $myRows))
+                  $foundKeys[] = $msRow->entity_id;
+                 */
+                if (!in_array($msRow->entity_id, $myRows)) {
+                    //  echo '<br>entity_id' . $msRow->entity_id;
+                    $foundKeys[] = $msRow->entity_id;
+                    // echo '<br>--- $key --- ' . $key;
+                    // echo '<br>--- $foundKeys ---<br>';
+                    //  var_dump($foundKeys);
+                } else {
+                    $foundKeys2[] = $msRow->entity_id;
+                }
 
-        foreach ($msRows as $key => $msRow) {
-            //  echo '<br> 2  $msRow -<br>';
-            //  var_dump($msRow);
-            //  echo '<br> -- $msRow->entity_id ---' . $msRow->entity_id;
-            // echo '<br> $myRows -<br>';
-            // var_dump($myRows);
-            /* if (!array_key_exists('"'.$msRow->entity_id.'"', $myRows))
-              $foundKeys[] = $msRow->entity_id;
-             */
-            if (!in_array($msRow->entity_id, $myRows)) {
-                //  echo '<br>entity_id' . $msRow->entity_id;
-                $foundKeys[] = $msRow->entity_id;
-                // echo '<br>--- $key --- ' . $key;
-                // echo '<br>--- $foundKeys ---<br>';
-                //  var_dump($foundKeys);
-            } else {
-                $foundKeys2[] = $msRow->entity_id;
+                if ($total == $tmpKey) {
+                    $entity_params = array('add_entity' => $foundKeys, 'upd_entity' => $foundKeys2);
+                    // var_dump($entity_params);
+                    return $entity_params;
+                }
+                $tmpKey++;
+                /* if ($total - 1 == $key) {
+                  return $foundKeys;
+                  } */
+                /* echo '<br> 1  $msRow -<br>';
+                  var_dump($msRow);
+                  echo '<br> --1 entity_id --' . $msRow->entity_id;
+                  // echo '<br> --1 entity_id --' . $msRow['entity_id'];
+                  echo '<br> 2  $myRows -<br>';
+                  var_dump($myRows);
+                  echo '<br> --2 entity_id --' . $myRows->entity_id;
+                  // echo '<br> --2 entity_id --' . $myRows['entity_id']; */
+                /* if(!in_array($msRow, $myRows))
+                  $foundKeys[] = $key;
+
+                  if ($total - 1 == $key) {
+                  return $foundKeys;
+                  } */
             }
-
-            if ($total == $tmpKey) {
-                $entity_params = array('add_entity' => $foundKeys, 'upd_entity' => $foundKeys2);
-                // var_dump($entity_params);
-                return $entity_params;
-            }
-            $tmpKey++;
-            /* if ($total - 1 == $key) {
-              return $foundKeys;
-              } */
-            /* echo '<br> 1  $msRow -<br>';
-              var_dump($msRow);
-              echo '<br> --1 entity_id --' . $msRow->entity_id;
-              // echo '<br> --1 entity_id --' . $msRow['entity_id'];
-              echo '<br> 2  $myRows -<br>';
-              var_dump($myRows);
-              echo '<br> --2 entity_id --' . $myRows->entity_id;
-              // echo '<br> --2 entity_id --' . $myRows['entity_id']; */
-            /* if(!in_array($msRow, $myRows))
-              $foundKeys[] = $key;
-
-              if ($total - 1 == $key) {
-              return $foundKeys;
-              } */
         }
         /* foreach ($msRows as $key => $msRow) {
           if (!array_key_exists($msRow['unique_name'], $myRows)) {
@@ -326,38 +327,39 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
         }
 
         $get_upd_row = $this->upd_row($get_entity->entities->entity, $local_entity_array, $get_entity->total);
+        if ($get_entity->entities->entity) {
+            foreach ($get_entity->entities->entity as $key => $entity) {
+                if ($entity->parent_id <= 0 || $entity->parent_id == '')
+                    $entity->parent_id = 0;
 
-        foreach ($get_entity->entities->entity as $key => $entity) {
-            if ($entity->parent_id <= 0 || $entity->parent_id == '')
-                $entity->parent_id = 0;
-
-            if (in_array($entity->entity_id, $get_upd_row['add_entity'])) {
-                //усли таких entity нет в локадбной БД, то записываем
-                $query = "insert into wp_entity
+                if (in_array($entity->entity_id, $get_upd_row['add_entity'])) {
+                    //усли таких entity нет в локадбной БД, то записываем
+                    $query = "insert into wp_entity
                       (entity_id, organization, parent_id, status)
                       values ($entity->entity_id, '$entity->organization', $entity->parent_id, '$entity->status')";
-                $wpdb->query($query);
-                //echo '<br><br> $entity->entity_id = ' . $entity->entity_id;
-                //echo '<br> $entity->organization = ' . $entity->organization;
-                //echo '<br> $entity->parent_id = ' . $entity->parent_id;
-                //echo '<br> $entity->type = ' . $entity->type; 
-            } else {
-                $wpdb->query("UPDATE wp_entity SET organization = '$entity->organization', parent_id=$entity->parent_id, status='$entity->status' "
-                        . "WHERE entity_id = '$entity->entity_id'");
-                /*  echo '<br><br>else!!!!<br>';
-                  echo '<br>else! $entity->entity_id =' . $entity->entity_id;
-                  echo '<br>else! $entity->parent_id =' . $entity->parent_id; */
+                    $wpdb->query($query);
+                    //echo '<br><br> $entity->entity_id = ' . $entity->entity_id;
+                    //echo '<br> $entity->organization = ' . $entity->organization;
+                    //echo '<br> $entity->parent_id = ' . $entity->parent_id;
+                    //echo '<br> $entity->type = ' . $entity->type; 
+                } else {
+                    $wpdb->query("UPDATE wp_entity SET organization = '$entity->organization', parent_id=$entity->parent_id, status='$entity->status' "
+                            . "WHERE entity_id = '$entity->entity_id'");
+                    /*  echo '<br><br>else!!!!<br>';
+                      echo '<br>else! $entity->entity_id =' . $entity->entity_id;
+                      echo '<br>else! $entity->parent_id =' . $entity->parent_id; */
+                }
+                /*     $query = "insert into wp_entity
+                  (entity_id, organization, parent_id, type)
+                  values ($entity->entity_id, '$entity->organization', $entity->parent_id, '$entity->type')";
+                  $wpdb->query($query);
+                  echo '<br><br> $entity->entity_id = ' . $entity->entity_id;
+                  echo '<br> $entity->organization = ' . $entity->organization;
+                  echo '<br> $entity->parent_id = ' . $entity->parent_id;
+                  echo '<br> $entity->type = ' . $entity->type;
+                 * 
+                 */
             }
-            /*     $query = "insert into wp_entity
-              (entity_id, organization, parent_id, type)
-              values ($entity->entity_id, '$entity->organization', $entity->parent_id, '$entity->type')";
-              $wpdb->query($query);
-              echo '<br><br> $entity->entity_id = ' . $entity->entity_id;
-              echo '<br> $entity->organization = ' . $entity->organization;
-              echo '<br> $entity->parent_id = ' . $entity->parent_id;
-              echo '<br> $entity->type = ' . $entity->type;
-             * 
-             */
         }
         if ($get_upd_row['upd_entity']) {
             // echo '<br>upd_entity!!!';
@@ -585,7 +587,7 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
         ?>
         <h3>LiveRail Entity Params </h3>
 
-        <form method="post" id="update_entity_params_form" name="update_entity_params_form" action="<?php //echo $this->page_url(array( 'update_entity_params' => 'true'))                                                                                                                 ?>">
+        <form method="post" id="update_entity_params_form" name="update_entity_params_form" action="<?php //echo $this->page_url(array( 'update_entity_params' => 'true'))                                                                                                                   ?>">
             <p class="submit">
                 <input type="hidden" name="update_entity_params" id="update_entity_params" value="true" />
                 <input type="submit" name="update_entity_submit_form" id="update_entity_submit_form" class="button-primary" value="Update Entity Params"/>
@@ -612,7 +614,7 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
         </div>
 
 
-        <form method="post" id="add_player_form" name="add_player_form" action="<?php //echo $this->page_url(array('noheader' => 'true', 'new_entity_id' => 'true'))                                                                                             ?>">
+        <form method="post" id="add_player_form" name="add_player_form" action="<?php //echo $this->page_url(array('noheader' => 'true', 'new_entity_id' => 'true'))                                                                                               ?>">
             <?php settings_fields(JWPLIMELIGHT . 'menu'); ?>
             <p class="submit">
                 <input type="hidden" name="noheader" value="true" />
@@ -662,11 +664,11 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
             <td><?php echo $entity->organization; ?></td>
             <td><?php echo $entity->parent_id; ?></td>
             <td><?php echo $entity->status; ?></td>
-           <!-- <td><a href="<?php //echo $player->admin_url($this, 'edit');                                                                                                                                                           ?>" class="button jwplimelight_edit">Edit</a></td>
-            <td><a href="<?php //echo $player->admin_url($this, 'copy');                                                                                                                                                         ?>" class="button jwplimelight_copy">Copy</a></td>
+           <!-- <td><a href="<?php //echo $player->admin_url($this, 'edit');                                                                                                                                                             ?>" class="button jwplimelight_edit">Edit</a></td>
+            <td><a href="<?php //echo $player->admin_url($this, 'copy');                                                                                                                                                           ?>" class="button jwplimelight_copy">Copy</a></td>
             <td>
             <?php if ($entity->entity_id): ?>
-                                                                                                                                                                                                                    <a href="<?php //echo $player->admin_url($this, 'delete');                                                                                                                                   ?>" class="button jwplimelight_delete">Delete</a>
+                                                                                                                                                                                                                    <a href="<?php //echo $player->admin_url($this, 'delete');                                                                                                                                     ?>" class="button jwplimelight_delete">Delete</a>
             <?php endif; ?>
             </td>-->
         </tr>
@@ -699,11 +701,11 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
             <td><?php echo $entity->organization; ?></td>
             <td><?php echo $entity->parent_id; ?></td>
             <td><?php echo $entity->type; ?></td>
-            <td><a href="<?php //echo $player->admin_url($this, 'edit');                                                                                                                                                           ?>" class="button jwplimelight_edit">Edit</a></td>
-            <td><a href="<?php //echo $player->admin_url($this, 'copy');                                                                                                                                                         ?>" class="button jwplimelight_copy">Copy</a></td>
+            <td><a href="<?php //echo $player->admin_url($this, 'edit');                                                                                                                                                             ?>" class="button jwplimelight_edit">Edit</a></td>
+            <td><a href="<?php //echo $player->admin_url($this, 'copy');                                                                                                                                                           ?>" class="button jwplimelight_copy">Copy</a></td>
             <td>
                 <?php if ($entity->entity_id): ?>
-                    <a href="<?php //echo $player->admin_url($this, 'delete');                                                                                                                                  ?>" class="button jwplimelight_delete">Delete</a>
+                    <a href="<?php //echo $player->admin_url($this, 'delete');                                                                                                                                    ?>" class="button jwplimelight_delete">Delete</a>
                 <?php endif; ?>
             </td>
         </tr>

@@ -648,6 +648,7 @@ class WP_List_Table {
 		$hidden = get_hidden_columns( $this->screen );
 
 		$sortable_columns = $this->get_sortable_columns();
+                //var_dump($sortable_columns);
 		/**
 		 * Filter the list table sortable columns for a specific screen.
 		 *

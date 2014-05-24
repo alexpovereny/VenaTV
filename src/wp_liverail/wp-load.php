@@ -51,7 +51,8 @@ if ( file_exists( ABSPATH . 'wp-config.php') ) {
 	require_once( ABSPATH . WPINC . '/functions.php' );
 
 	$path = wp_guess_url() . '/wp-admin/setup-config.php';
-
+        // Include the $lrapi class
+        //require_lr_api();
 	// Die with an error message
 	$die  = __( "There doesn't seem to be a <code>wp-config.php</code> file. I need this before we can get started." ) . '</p>';
 	$die .= '<p>' . __( "Need more help? <a href='http://codex.wordpress.org/Editing_wp-config.php'>We got it</a>." ) . '</p>';

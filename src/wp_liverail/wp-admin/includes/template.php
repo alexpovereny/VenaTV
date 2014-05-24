@@ -757,7 +757,7 @@ function wp_dropdown_roles( $selected = false ) {
 	$r = '';
 
 	$editable_roles = array_reverse( get_editable_roles() );
-
+       
 	foreach ( $editable_roles as $role => $details ) {
 		$name = translate_user_role($details['name'] );
 		if ( $selected == $role ) // preselect specified role
