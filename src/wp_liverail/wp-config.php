@@ -18,11 +18,11 @@
 /** The name of the database for WordPress */
 define('DB_NAME', 'wp_liverail_git');
 /** MySQL database username */
-define('DB_USER', 'root');
+define('DB_USER', '');
 /** MySQL database password */
 define('DB_PASSWORD', '');
 /** MySQL hostname */
-define('DB_HOST', '127.0.0.1');
+define('DB_HOST', '');
 /** Database Charset to use in creating database tables. */
 define('DB_CHARSET', 'utf8');
 /** The Database Collate type. Don't change this if in doubt. */
@@ -49,9 +49,7 @@ define('NONCE_SALT', 'put your unique phrase here');
 define('LRAPI_URL', 'http://api4.int.liverail.com');
 define('LRAPI_USER', 'alex.povereny@gmail.com');
 define('LRAPI_PASSWORD', 'alexvena2014');
-//$ENTITY_ID = 8987;
-//define('ENTITY_ID', '8988');
-//entity_id>8988
+
 /**
  * WordPress Database Table prefix.
  *
