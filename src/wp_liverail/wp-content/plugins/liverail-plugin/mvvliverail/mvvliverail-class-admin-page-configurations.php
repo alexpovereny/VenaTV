@@ -7,34 +7,6 @@ class MVVLIVERAIL_Admin_Page_Configurations extends MVVLIVERAIL_Admin_Page {
     public function __construct() {
         global $lrapi;
         parent::__construct();
-        /*
-          if ($liverail_api == NULL) {
-
-          }
-
-          $options_tmp = get_option(MVVLIVERAIL . 'options');
-          echo '<br> --- options!!! --- <br>';
-          var_dump($options_tmp);
-
-          $token_tmp = get_option(MVVLIVERAIL . 'token');
-          echo '<br> --- token!!! --- <br>';
-          var_dump($token_tmp);
-
-          if ($token_tmp) {
-          $liverail_url = $options_tm->MVVLIVERAIL . "url"; //$liverail_url = $options_tmp[MVVLIVERAIL . "url"];
-          $liverail_url_test = $options_tmp->MVVLIVERAIL . "test_url"; // $liverail_url_test = $options_tmp[MVVLIVERAIL . "test_url"];
-
-          update_option(MVVLIVERAIL . 'token', $getToken);
-          } else {
-          echo '<br> else!!!<br>';
-          $getToken_ = LiveRailApi::getToken();
-          var_dump($getToken_);
-          }
-         */
-        // extract( $this->_args );
-        // wp_nonce_field( "fetch-list-" . get_class( $this ), '_ajax_fetch_list_nonce' );
-        // $this->display_tablenav( 'top' );
-        // WP_Comments_List_Table
     }
 
     public function set_entity($entityId) {

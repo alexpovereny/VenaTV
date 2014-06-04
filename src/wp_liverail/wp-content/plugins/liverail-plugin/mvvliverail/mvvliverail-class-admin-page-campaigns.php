@@ -1,10 +1,5 @@
 <?php
 
-// Виды табличек
-//http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
-//http://jsfiddle.net/JPVUk/4/
-//https://editor.datatables.net/   редактирование
-//https://editor.datatables.net/examples/simple/simple
 //Creative Campaigns
 ///creative/campaign/add 
 ///creative/campaign/edit 

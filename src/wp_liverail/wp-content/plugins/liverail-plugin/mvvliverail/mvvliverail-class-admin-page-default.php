@@ -53,11 +53,10 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
             //  echo '<br> else entity_organization !!!';
         }
 
-        //Добавление и обновление entity данных в БД
-        //синхронизация данных с LiveRail API
+        //Adding and updating entity data into the database 
+        //synchronization with LiveRail API
         //$this->get_entity_and_save_params();
         if (isset($_POST['update_entity_params'])) {
-            //   echo '<br>$_GET[update_entity_params] !!! <br>';
             return $this->get_entity_and_save_params();
         }
         return $this->_init_overview_page();
@@ -67,27 +66,19 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
         global $wpdb, $lrapi;
         $message = array();
 
-        // echo '<br>!!! if  add_entity';
-        //  var_dump($param);
-        //echo '<br><br>$param - ' . $param["site_url"];
-        //echo '<br>!!! add_entity';
         if (isset($param)) {
             $set_entity = $lrapi->callApi('/entity/add', $param);
-            //echo '<br>!!! $set_entity  ---<br>';
-            //var_dump($set_entity);
+
             if ($set_entity != FALSE) {
                 $message[] = __('Create new entity in LiveRail API.');
                 $get_xml_doc = $lrapi->getLastApiXmlDoc();
-                //echo '<br><br> $get_xml_doc ---';
-                //var_dump($get_xml_doc);
-                //echo '<br>2 $get_xml_doc ---';
-                //var_dump(json_encode($get_xml_doc));
+
                 $query_add_entity = "insert into wp_entity
                   (entity_id, organization, parent_id, status)
                   values ($get_xml_doc->entity_id, '" . $param['organization'] . "', " . $get_xml_doc->auth->entity->entity_id . ", '" . $param['status'] . "')";
-                // echo '<br>$query -' . $query_add_entity;
+
                 $res_add_entity = $wpdb->query($query_add_entity);
-                //  echo '<br>$res -' . $res_add_entity;
+
                 if ($res_add_entity == 1) {
                     $message[] = __('Create new entity in local DB.');
                 } else {
@@ -96,20 +87,14 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
                     $error_msg_ = $res_add_entity;
                     $this->errors->add($error_msg_field, __('<strong>ERROR</strong>: ' . $error_msg_));
                 }
-                //  $this->header_error_params('', $message);
             } else {
-                //Ошибка при создании entity в LiveRail 
+                //Error creating entity in LiveRail
                 $get_xml_doc = $lrapi->getLastApiXmlDoc();
                 $error_msg_ = (string) $get_xml_doc->error->message;
                 $error_msg_field = (string) $get_xml_doc->error->field;
                 $this->errors = new WP_Error();
                 $this->errors->add($error_msg_field, __('<strong>ERROR</strong>: ' . $error_msg_));
-                //echo '<br>~~~~~~~~~ ERROR<br>';
-                //var_dump($errors);
-                // $this->errors = $errors;
-                // $this->header_error_params($this->errors);
             }
-
             $this->header_error_params($this->errors, $message);
         }
     }
@@ -176,7 +161,7 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
             if (isset($_POST['new_entity_id']) && $_POST['new_entity_id']) {
                 
             }
-            // При обновлении всех данных entity 
+            // When you update all the data entity 
             if (isset($_POST['update_entity_params']) && $_POST['update_entity_params']) {
                 exit();
             }
@@ -203,7 +188,7 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
     }
 
     private function upd_row($msRows, $myRows, $total, $api_entity_array) {
-        $addKeys = array(); //массив ключей строк, которые надо обновить
+        $addKeys = array(); //The array keys of rows that need to update their
         $updKeys = array();
         $delKeys = array();
         $tmpKey = 1;
@@ -219,8 +204,6 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
                     foreach ($myRows as $key => $my_value) {
                         if (!in_array($my_value, $api_entity_array)) {
                             $delKeys[] = $my_value;
-                            //echo '<br><br>--- if ---<br>';
-                            //echo '<br>--- $my_value ---' . $my_value;
                         }
                     }
                     $entity_params = array('add_entity' => $addKeys, 'del_entity' => $delKeys, 'upd_entity' => $updKeys);
@@ -254,8 +237,7 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
                     $entity->parent_id = 0;
 
                 if (in_array($entity->entity_id, $get_upd_row['add_entity'])) {
-                    echo '<br><br>insert!!!!<br>';
-                    //усли таких entity нет в локадбной БД, то записываем
+                    //if such entity is not in the local database, then write
                     $query = "insert into wp_entity
                       (entity_id, organization, parent_id, status)
                       values ($entity->entity_id, '$entity->organization', $entity->parent_id, '$entity->status')";
@@ -267,7 +249,7 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
             }
         }
         if ($get_upd_row['del_entity']) {
-            //Удаляем аписи с локальной БД, которых нет в API
+            //Delete records from the local database that are not in API
             foreach ($get_upd_row['del_entity'] as $key => $entity_id) {
                 $wpdb->query("DELETE FROM wp_entity WHERE entity_id = '$entity_id'");
             }
@@ -297,7 +279,6 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
             }
 
             if ($get_entity->total == $tmp) {
-                // echo '<br> $get_entity->total !!!   ' . $get_entity->total . '  $key=' . $key;
                 return $this->render_overview();
             }
             $tmp++;
@@ -307,11 +288,11 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
     }
 
     private function _init_add_params() {
-        echo '<br> !!! _init_add_params <br>';
+        // echo '<br>_init_add_params <br>';
     }
 
     private function _init_edit_page() {
-        echo '<br> !!! _init_edit_page <br>';
+        // echo '<br>_init_edit_page <br>';
     }
 
     protected function render_form_row($field) {
@@ -337,8 +318,6 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
     }
 
     protected function render_form_select($field) {
-        echo '<br> $field->options - ';
-        var_dump($field->options);
 
         $selected_value = ( is_null($field->post_value) ) ? $field->value : $field->post_value;
         echo "<select id='id_{$field->name}' name='{$field->name}' class='{$field->class}'>\n";
@@ -363,22 +342,6 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
         <div class="backlink">
             <a href="<?php echo $this->page_url(); ?>">← Back to the list entity</a>
         </div>
-        <script type="text/javascript">
-            jQuery(function() {
-                var $ = jQuery;
-                function check_aspect_ratio() {
-                    if ('NULL' == $('#id_aspectratio').val()) {
-                        $('#width_row, #height_row').show();
-                    } else {
-                        $('#width_row, #height_row').hide();
-                    }
-                }
-                $('#id_aspectratio').bind('change', function() {
-                    check_aspect_ratio();
-                });
-                check_aspect_ratio();
-            });
-        </script>
         <?php
         $this->render_all_messages();
         ?>
@@ -445,7 +408,7 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
         ?>
         <h3>LiveRail Entity Params </h3>
 
-        <form method="post" id="update_entity_params_form" name="update_entity_params_form" action="<?php //echo $this->page_url(array( 'update_entity_params' => 'true'))                                                                                                                                  ?>">
+        <form method="post" id="update_entity_params_form" name="update_entity_params_form" action="<?php //echo $this->page_url(array( 'update_entity_params' => 'true'))                                                                                                                                   ?>">
             <p class="submit">
                 <input type="hidden" name="update_entity_params" id="update_entity_params" value="true" />
                 <input type="submit" name="update_entity_submit_form" id="update_entity_submit_form" class="button-primary" value="Update Entity Params"/>
@@ -472,7 +435,7 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
         </div>
 
 
-        <form method="post" id="add_entity_form" name="add_entity_form" action="<?php //echo $this->page_url(array('noheader' => 'true', 'new_entity_id' => 'true')) ?>">
+        <form method="post" id="add_entity_form" name="add_entity_form" action="<?php //echo $this->page_url(array('noheader' => 'true', 'new_entity_id' => 'true'))  ?>">
             <p class="submit">
                 <input type="hidden" name="noheader" value="true" />
                 <input type="hidden" name="new_entity_id" id="new_entity_id" value="true"/>
@@ -516,8 +479,8 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
             <td><?php echo $entity->organization; ?></td>
             <td><?php echo $entity->parent_id; ?></td>
             <td><?php echo $entity->status; ?></td>
-           <!-- <td><a href="<?php //echo $entity->admin_url($this, 'edit');   ?>                                                                                                                                                                       
-            <td><a href="<?php //echo $entity->admin_url($this, 'copy');  ?>                                                                                                                                                                      
+           <!-- <td><a href="<?php //echo $entity->admin_url($this, 'edit');    ?>                                                                                                                                                                       
+            <td><a href="<?php //echo $entity->admin_url($this, 'copy');   ?>                                                                                                                                                                      
             <td>
             <?php if ($entity->entity_id): ?>
             <?php endif; ?>
@@ -537,11 +500,11 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
             <td><?php echo $entity->organization; ?></td>
             <td><?php echo $entity->parent_id; ?></td>
             <td><?php echo $entity->type; ?></td>
-            <td><a href="<?php //echo $entity->admin_url($this, 'edit'); ?>" class="button mvvliverail_edit">Edit</a></td>
-            <td><a href="<?php //echo $entity->admin_url($this, 'copy');  ?>" class="button mvvliverail_copy">Copy</a></td>
+            <td><a href="<?php //echo $entity->admin_url($this, 'edit');  ?>" class="button mvvliverail_edit">Edit</a></td>
+            <td><a href="<?php //echo $entity->admin_url($this, 'copy');   ?>" class="button mvvliverail_copy">Copy</a></td>
             <td>
                 <?php if ($entity->entity_id): ?>
-                    <a href="<?php //echo $entity->admin_url($this, 'delete');  ?>" class="button mvvliverail_delete">Delete</a>
+                    <a href="<?php //echo $entity->admin_url($this, 'delete');   ?>" class="button mvvliverail_delete">Delete</a>
                 <?php endif; ?>
             </td>
         </tr>
