@@ -195,12 +195,6 @@ class LiveRailApi {
         /* load the JSON */
         $this->_jsonDoc = json_encode($xml, JSON_PRETTY_PRINT);
 
-        /* echo '<br> --- data --- <br>';
-          var_dump($data);
-
-          echo '<br> --- $this->_jsonDoc --- <br>';
-          var_dump($this->_jsonDoc); */
-
         /* load the XML */
         $this->_xmlDoc = @simplexml_load_string($data);
         if ($this->_xmlDoc === false) {
@@ -299,45 +293,19 @@ class LiveRailApi {
         curl_close($curl);
         $this->_xml = $data;
 
-        //   echo '<br>--- $data ---<br>';
-        //   var_dump($data);
         /* load the XML */
         $xml = simplexml_load_string($data);
 
-        //    echo '<br>--- $xml ---<br>';
-        //    var_dump($xml);
         /* load the JSON */
         $this->_jsonDoc = json_encode($xml, JSON_PRETTY_PRINT);
-        /*
-          echo '<br>--- $this->_jsonDoc ---<br>';
-          var_dump($this->_jsonDoc);
-          echo '<br>---2 $this->_jsonDoc ---<br>';
-          var_dump($this->_jsonDoc.error);
-          echo '<br>---3 $this->_jsonDoc ---<br>';
-          echo (string) $this->_jsonDoc->error->message; */
-        // echo '<br> --- $data --- <br>';
-        //  var_dump($this->_xml);
+      
         /* load the XML */
         $this->_xmlDoc = @simplexml_load_string($data);
-        /* echo '<br>--- $this->_xmlDoc ---<br>';
-          var_dump($this->_xmlDoc);
-          echo '<br>--- $this->_xmlDoc->error ---<br>';
-          var_dump($this->_xmlDoc->error);
-          echo '<br>--- $this->_xmlDoc->error->message ---<br>';
-          var_dump($this->_xmlDoc->error->message);
-          echo '<br>---!!! $this->_xmlDoc->error->message ---<br>';
-          echo (string) $this->_xmlDoc->error->message;
-          echo '<br>--- json_encode $this->_xmlDoc->error->message ---<br>';
-          var_dump(json_encode($this->_xmlDoc->error, JSON_PRETTY_PRINT)); */
-
-        //   echo '<br>---!!! $this->_xmlDoc->error->message ---<br>';
-        //   echo (string) $this->_xmlDoc->error->message;
-
+       
         if ($this->_xmlDoc === false) {
             return false;
         } //end if
-        // echo '<br> --- $this->_xmlDoc --- <br>';
-        //  var_dump($this->_xmlDoc);
+       
         /* check the status */
         if ((string) $this->_xmlDoc->status != "success") {
             return false;
@@ -347,9 +315,7 @@ class LiveRailApi {
         //   $xml = simplexml_load_string($data);
         /* load the JSON */
         //   $this->_jsonDoc = json_encode($xml, JSON_PRETTY_PRINT);
-        //   echo '<br> --- _jsonDoc --- <br>';
-        //   var_dump($this->_jsonDoc);
-
+      
         return true;
     }
 

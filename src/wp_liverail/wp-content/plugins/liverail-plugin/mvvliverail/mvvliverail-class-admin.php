@@ -1,15 +1,10 @@
 <?php
 
-class MVVLIVERAIL_Admin { //liverail JWPLIMELIGHT_Admin {
+class MVVLIVERAIL_Admin { 
 
     public function __construct() {
-        global $wp_version;
-        // $this->previous_version = get_option(JWPLIMELIGHT . 'previous_version');
-        // if ( version_compare($wp_version, '3.5', '<') ) add_action('media_buttons', array($this, 'media_button'), 99);
         add_action("init", array($this, 'enqueue_scripts_and_styles'));
         add_action('admin_menu', array($this, 'admin_menu'));
-
-        //JWPLIMELIGHT_Media::actions_and_filters();
     }
 
     public static function enqueue_scripts_and_styles() {
@@ -44,9 +39,6 @@ class MVVLIVERAIL_Admin { //liverail JWPLIMELIGHT_Admin {
 //Smart Pricing floors
 
     public function admin_menu() {
-        // $admin_page = current_user_can('advertiser') ? 'network': 'administrator';
-        // echo '<br>url 1 -' . plugins_url('liverail-plugin/img/wordpress.png');
-        // echo '<br>url 2 -' . MVVLIVERAIL_PLUGIN_URL . "img/wordpress.png";
         $admin = add_menu_page(
                 "LiveRail Title", // $page_title
                 "LiveRail Admin", // $menu_title
@@ -98,17 +90,6 @@ class MVVLIVERAIL_Admin { //liverail JWPLIMELIGHT_Admin {
                 array($this, 'admin_pages')//
         );
         
-        add_submenu_page(
-                MVVLIVERAIL . "menu", //
-                "LiveRail Settings", //
-                "LiveRail settings", //
-                "administrator", //
-                MVVLIVERAIL . "menu_liverail_settings", //
-                array($this, 'admin_pages')//
-        );
-        //add_action("admin_print_scripts-$admin", "add_admin_js");
-        //add_action("admin_print_scripts-$media", "add_admin_js");
-        //add_action("admin_print_scripts-mvvadmin", "add_admin_js");
     }
 
     // Add js for plugin tabs.
@@ -147,24 +128,8 @@ class MVVLIVERAIL_Admin { //liverail JWPLIMELIGHT_Admin {
                 require_once (MVVLIVERAIL_PLUGIN_DIR . '/mvvliverail-class-admin-page-orders.php');
                 $page = new MVVLIVERAIL_Admin_Page_Orders();
                 break;
-            case MVVLIVERAIL . "menu_liverail_settings":
-                require_once (MVVLIVERAIL_PLUGIN_DIR . '/mvvliverail-class-admin-page-settings.php');
-                $page = new MVVLIVERAIL_Admin_Page_Settings();
-                break;
-            /* case MVVLIVERAIL . "menu" :
-              echo '<br>111<br>';
-              require_once (MVVLIVERAIL_PLUGIN_DIR . '/mvvliverail-class-admin-page-menu.php');
-              break; */
-            /* case JWPLIMELIGHT . "menu_licensing" :
-              require_once (JWPLIMELIGHT_PLUGIN_DIR . '/mvvliverail-class-admin-page-settings.php');
-              $page = new JWPLIMELIGHT_Admin_Page_Licensing();
-              break;
-              case JWPLIMELIGHT ."menu_limelight_options":
-              require_once (JWPLIMELIGHT_PLUGIN_DIR . '/mvvliverail-class-admin-page-options.php');
-              $page = new JWPLIMELIGHT_Admin_Page_Options();
-              break; */
+         
             default:
-                //echo '<br>1<br>';
                 require_once (MVVLIVERAIL_PLUGIN_DIR . '/mvvliverail-class-admin-page-default.php');
                 $page = new MVVLIVERAIL_Admin_Page_Default();
                 break;

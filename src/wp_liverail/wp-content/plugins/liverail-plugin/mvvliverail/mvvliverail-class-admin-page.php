@@ -18,14 +18,7 @@ class MVVLIVERAIL_Admin_Page {
     public $page_slug;
 
     public function __construct() {
-        $notification = get_option(JWPLIMELIGHT . 'notification');
-        if ( $notification ) {
-            $this->add_message($notification);
-            delete_option(JWPLIMELIGHT . 'notification');
-        }
     }
-
-    // Python's .get() dictionary method.
     protected function _get($array, $key, $default = false) {
         return ( isset($array[$key]) ) ? $array[$key] : $default;
     }
@@ -110,9 +103,9 @@ class MVVLIVERAIL_Admin_Page {
 
     protected function render_page_start($title)  {
         ?>
-        <div id="wpbody-content" class="jwplimelight">
+        <div id="wpbody-content" class="mvvliverail">
             <div class="wrap">
-                <div id="icon-jwplimelight-main" class="icon32"></div>
+                <div id="icon-mvvliverail-main" class="icon32"></div>
                 <h2><?php echo $title; ?></h2>
         <?php
     }

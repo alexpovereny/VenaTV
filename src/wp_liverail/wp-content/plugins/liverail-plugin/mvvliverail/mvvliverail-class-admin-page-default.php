@@ -8,13 +8,7 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
     private $overview_or_edit = 'overview';
     public static $entity_options = array();
 
-    //private $players = array();
-    //private $player;
-
     public function render() {
-
-        // echo '<br>--- $this ---<br>';
-        // var_dump($this);
         if ('new' == $this->overview_or_edit || (isset($this->entity_options) && $this->errors)) {
             return $this->render_edit_page();
         }
@@ -23,7 +17,6 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
 
     public function __construct() {
         parent::__construct();
-
 
         $this->entity_options = array(
             'status' => array(
@@ -40,11 +33,7 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
                 'help_text' => 'Help text'
             )
         );
-        //echo '<br> --- $_GET --- <br>';
-        //var_dump($_GET);
-        //echo '<br> --- $_POST --- <br>';
-        //var_dump($_POST);
-        //exit();
+
         //Open page for create new entity
         if (isset($_POST['new_entity_id'])) {
             $this->overview_or_edit = 'new';
@@ -177,57 +166,24 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
         <?php
     }
 
-    protected function process_action() {
-        if ('delete' == $_GET['action']) {
-            $player = new JWPLIMELIGHT_Player($_GET['player_id']);
-            $player->purge();
-            $this->add_message("Player {$player->get_id()} has been deleted.");
-            unset($player);
-        }
-    }
-
     public function process_post_data($post_data) {
         parent::process_post_data($post_data, false);
-        if (isset($_GET['player_id'])) {
-            return $this->process_edit_post_data($post_data);
-        } else {
-            //   return $this->render_edit_page();
-            //  return $this->process_overview_post_data($post_data);
-            // exit();
-        }
     }
 
     protected function process_overview_post_data($post_data) {
-        echo '<br> function process_overview_post_data<br>';
-        var_dump($post_data);
-        echo '<br> --- $this ---<br>';
-        var_dump($this);
+
         if (!count($this->form_error_fields)) {
             if (isset($_POST['new_entity_id']) && $_POST['new_entity_id']) {
                 
             }
-            // При обновлении всех entity данных
+            // При обновлении всех данных entity 
             if (isset($_POST['update_entity_params']) && $_POST['update_entity_params']) {
                 exit();
             }
         }
 
-        // var_dump($this);
         wp_redirect($this->page_url());
         exit();
-    }
-
-    protected function process_edit_post_data($post_data) {
-        foreach ($this->form_fields as $field) {
-            $ok = $this->player->set($field->name, $field->value);
-        }
-        if (!count($this->form_error_fields)) {
-            $this->player->save();
-            wp_redirect($this->page_url(array('player_saved' => $this->player->get_id())));
-            exit();
-        } else {
-            wp_head();
-        }
     }
 
     private function _init_overview_page() {
@@ -236,10 +192,6 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
         // $get_entity = $lrapi->callApi('/entity/list', $params);
         // echo '<br> --- $get_entity --- <br>';
         // var_dump($get_entity);
-
-        /* if ( isset($_GET['player_saved']) && array_key_exists($_GET['player_saved'], $this->players) ) {
-          $this->add_message("Changes for <strong>player {$_GET['player_saved']}</strong> have been saved successfully.");
-          } */
     }
 
     //$wpdb->query("UPDATE $wpdb->comments SET comment_approved = '1' WHERE comment_ID = '$comment'");
@@ -250,148 +202,77 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
         return $get_results;
     }
 
-    private function upd_row($msRows, $myRows, $total) {
-        $foundKeys = array(); //массив ключей строк, которые надо обновить
-        $foundKeys2 = array();
+    private function upd_row($msRows, $myRows, $total, $api_entity_array) {
+        $addKeys = array(); //массив ключей строк, которые надо обновить
+        $updKeys = array();
+        $delKeys = array();
         $tmpKey = 1;
-        /* echo '<br> 1  $myRows -<br>';
-          var_dump($myRows);
-          echo '<br> 1  $msRows -<br>';
-          var_dump($msRows);
-          echo '<br> --- $total=' . $total; */
         if ($msRows) {
             foreach ($msRows as $key => $msRow) {
-                //  echo '<br> 2  $msRow -<br>';
-                //  var_dump($msRow);
-                //  echo '<br> -- $msRow->entity_id ---' . $msRow->entity_id;
-                // echo '<br> $myRows -<br>';
-                // var_dump($myRows);
-                /* if (!array_key_exists('"'.$msRow->entity_id.'"', $myRows))
-                  $foundKeys[] = $msRow->entity_id;
-                 */
                 if (!in_array($msRow->entity_id, $myRows)) {
-                    //  echo '<br>entity_id' . $msRow->entity_id;
-                    $foundKeys[] = $msRow->entity_id;
-                    // echo '<br>--- $key --- ' . $key;
-                    // echo '<br>--- $foundKeys ---<br>';
-                    //  var_dump($foundKeys);
+                    $addKeys[] = $msRow->entity_id;
                 } else {
-                    $foundKeys2[] = $msRow->entity_id;
+                    $updKeys[] = $msRow->entity_id;
                 }
 
                 if ($total == $tmpKey) {
-                    $entity_params = array('add_entity' => $foundKeys, 'upd_entity' => $foundKeys2);
-                    // var_dump($entity_params);
+                    foreach ($myRows as $key => $my_value) {
+                        if (!in_array($my_value, $api_entity_array)) {
+                            $delKeys[] = $my_value;
+                            //echo '<br><br>--- if ---<br>';
+                            //echo '<br>--- $my_value ---' . $my_value;
+                        }
+                    }
+                    $entity_params = array('add_entity' => $addKeys, 'del_entity' => $delKeys, 'upd_entity' => $updKeys);
+                    //var_dump($entity_params);
                     return $entity_params;
                 }
                 $tmpKey++;
-                /* if ($total - 1 == $key) {
-                  return $foundKeys;
-                  } */
-                /* echo '<br> 1  $msRow -<br>';
-                  var_dump($msRow);
-                  echo '<br> --1 entity_id --' . $msRow->entity_id;
-                  // echo '<br> --1 entity_id --' . $msRow['entity_id'];
-                  echo '<br> 2  $myRows -<br>';
-                  var_dump($myRows);
-                  echo '<br> --2 entity_id --' . $myRows->entity_id;
-                  // echo '<br> --2 entity_id --' . $myRows['entity_id']; */
-                /* if(!in_array($msRow, $myRows))
-                  $foundKeys[] = $key;
-
-                  if ($total - 1 == $key) {
-                  return $foundKeys;
-                  } */
             }
         }
-        /* foreach ($msRows as $key => $msRow) {
-          if (!array_key_exists($msRow['unique_name'], $myRows)) {
-          $foundKeys[] = $key;
-          }
-          if ($total - 1 == $key) {
-          return $foundKeys;
-          }
-          } */
     }
 
     private function get_entity_and_save_params() {
         global $wpdb;
-        //return $this->render_overview();
         $get_entity = $this->get_entity();
         $tmp = 1;
         $local_entity_array = array();
         $local_entity_id = $wpdb->get_results("SELECT entity_id FROM wp_entity");
 
-        foreach ($local_entity_id as $key => $value) {
+        foreach ($local_entity_id as $key => $value)
             $local_entity_array[] = $value->entity_id;
-        }
 
-        $get_upd_row = $this->upd_row($get_entity->entities->entity, $local_entity_array, $get_entity->total);
+        $api_entity_array = array();
+        foreach ($get_entity->entities->entity as $key => $value)
+            $api_entity_array[] = (string) $value->entity_id;
+
+        $get_upd_row = $this->upd_row($get_entity->entities->entity, $local_entity_array, $get_entity->total, $api_entity_array);
+
         if ($get_entity->entities->entity) {
             foreach ($get_entity->entities->entity as $key => $entity) {
                 if ($entity->parent_id <= 0 || $entity->parent_id == '')
                     $entity->parent_id = 0;
 
                 if (in_array($entity->entity_id, $get_upd_row['add_entity'])) {
+                    echo '<br><br>insert!!!!<br>';
                     //усли таких entity нет в локадбной БД, то записываем
                     $query = "insert into wp_entity
                       (entity_id, organization, parent_id, status)
                       values ($entity->entity_id, '$entity->organization', $entity->parent_id, '$entity->status')";
                     $wpdb->query($query);
-                    //echo '<br><br> $entity->entity_id = ' . $entity->entity_id;
-                    //echo '<br> $entity->organization = ' . $entity->organization;
-                    //echo '<br> $entity->parent_id = ' . $entity->parent_id;
-                    //echo '<br> $entity->type = ' . $entity->type; 
-                } else {
-                    $wpdb->query("UPDATE wp_entity SET organization = '$entity->organization', parent_id=$entity->parent_id, status='$entity->status' "
-                            . "WHERE entity_id = '$entity->entity_id'");
-                    /*  echo '<br><br>else!!!!<br>';
-                      echo '<br>else! $entity->entity_id =' . $entity->entity_id;
-                      echo '<br>else! $entity->parent_id =' . $entity->parent_id; */
+                } else if (in_array($entity->entity_id, $get_upd_row['upd_entity'])) {
+                    /*  $wpdb->query("UPDATE wp_entity SET organization = '$entity->organization', parent_id=$entity->parent_id, status='$entity->status' "
+                      . "WHERE entity_id = '$entity->entity_id'"); */
                 }
-                /*     $query = "insert into wp_entity
-                  (entity_id, organization, parent_id, type)
-                  values ($entity->entity_id, '$entity->organization', $entity->parent_id, '$entity->type')";
-                  $wpdb->query($query);
-                  echo '<br><br> $entity->entity_id = ' . $entity->entity_id;
-                  echo '<br> $entity->organization = ' . $entity->organization;
-                  echo '<br> $entity->parent_id = ' . $entity->parent_id;
-                  echo '<br> $entity->type = ' . $entity->type;
-                 * 
-                 */
             }
         }
-        if ($get_upd_row['upd_entity']) {
-            // echo '<br>upd_entity!!!';
+        if ($get_upd_row['del_entity']) {
+            //Удаляем аписи с локальной БД, которых нет в API
+            foreach ($get_upd_row['del_entity'] as $key => $entity_id) {
+                $wpdb->query("DELETE FROM wp_entity WHERE entity_id = '$entity_id'");
+            }
         }
     }
-
-    // $get_results = $wpdb->get_results("SELECT * FROM wp_entity WHERE entity_id = '$entity->entity_id'");
-    /*
-      if (!$get_results['0']->entity_id && $entity->parent_id != '') {
-      $query = "insert into wp_entity
-      (entity_id, organization, parent_id, type)
-      values ($entity->entity_id, '$entity->organization', $entity->parent_id, '$entity->type')";
-      $wpdb->query($query);
-      echo '<br><br> $entity->entity_id = ' . $entity->entity_id;
-      echo '<br> $entity->organization = ' . $entity->organization;
-      echo '<br> $entity->parent_id = ' . $entity->parent_id;
-      echo '<br> $entity->type = ' . $entity->type;
-      } else if ($get_results['0']->entity_id != '' && $entity->entity_id != '' && $entity->parent_id != '') {
-      $wpdb->query("UPDATE wp_entity SET organization = '$entity->organization', parent_id=$entity->parent_id, type='$entity->type' "
-      . "WHERE entity_id = '$entity->entity_id'");
-      }
-
-      if ($get_entity->total == $tmp) {
-      // echo '<br> $get_entity->total !!!   ' . $get_entity->total . '  $key=' . $key;
-      return $this->render_overview();
-      }
-      $tmp++;
-      }
-      // echo '$get_entity->total -' . $get_entity->total;
-      // echo '<br> get_entity_and_save_params!!!'; */
-
-
 
     private function get_entity_and_save_params2() {
         global $wpdb;
@@ -431,26 +312,6 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
 
     private function _init_edit_page() {
         echo '<br> !!! _init_edit_page <br>';
-    }
-
-    private function _init_edit_page2() {
-        // Basic settings
-        $cannot_edit = false;
-        if ($this->imported_players && array_key_exists($this->player->get('description'), $this->imported_players)) {
-            $cannot_edit = 'You cannot edit the description of this player, because this is an imported JW5 player configuration and the description is used to map your old shortcodes to this player.';
-        } else if (!$this->player->get_id()) {
-            $cannot_edit = 'You cannot edit the description of the default editor.';
-        }
-        if ($cannot_edit) {
-            $description_field = new JWPLIMELIGHT_Form_Field_Uneditable(
-                    'description', array(
-                'value' => $this->player->get('description'),
-                'why_not' => $cannot_edit,
-                    )
-            );
-        } else {
-            
-        }
     }
 
     protected function render_form_row($field) {
@@ -498,7 +359,6 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
     }
 
     protected function render_edit_page() {
-        // $this->render_page_start('Edit player: <strong>' . $this->player->full_description() . '</strong>.');
         ?>
         <div class="backlink">
             <a href="<?php echo $this->page_url(); ?>">← Back to the list entity</a>
@@ -522,8 +382,6 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
         <?php
         $this->render_all_messages();
         ?>
-
-        <?php //echo $this->page_url(array('noheader' => 'true', 'player_id' => '1'))                      ?>
 
         <h3>Create Entity</h3>
         <h4>Add entity params:</h4>
@@ -587,7 +445,7 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
         ?>
         <h3>LiveRail Entity Params </h3>
 
-        <form method="post" id="update_entity_params_form" name="update_entity_params_form" action="<?php //echo $this->page_url(array( 'update_entity_params' => 'true'))                                                                                                                   ?>">
+        <form method="post" id="update_entity_params_form" name="update_entity_params_form" action="<?php //echo $this->page_url(array( 'update_entity_params' => 'true'))                                                                                                                                  ?>">
             <p class="submit">
                 <input type="hidden" name="update_entity_params" id="update_entity_params" value="true" />
                 <input type="submit" name="update_entity_submit_form" id="update_entity_submit_form" class="button-primary" value="Update Entity Params"/>
@@ -614,8 +472,7 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
         </div>
 
 
-        <form method="post" id="add_player_form" name="add_player_form" action="<?php //echo $this->page_url(array('noheader' => 'true', 'new_entity_id' => 'true'))                                                                                               ?>">
-            <?php settings_fields(JWPLIMELIGHT . 'menu'); ?>
+        <form method="post" id="add_entity_form" name="add_entity_form" action="<?php //echo $this->page_url(array('noheader' => 'true', 'new_entity_id' => 'true')) ?>">
             <p class="submit">
                 <input type="hidden" name="noheader" value="true" />
                 <input type="hidden" name="new_entity_id" id="new_entity_id" value="true"/>
@@ -626,11 +483,6 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
             jQuery(function() {
 
             });
-            /* jQuery(function () {
-             var jwplimelight = new JWPLIMELIGHTAdmin();
-             jwplimelight.player_copy();
-             jwplimelight.player_delete();
-             });*/
         </script>
         <?php
         $this->render_page_end();
@@ -664,11 +516,10 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
             <td><?php echo $entity->organization; ?></td>
             <td><?php echo $entity->parent_id; ?></td>
             <td><?php echo $entity->status; ?></td>
-           <!-- <td><a href="<?php //echo $player->admin_url($this, 'edit');                                                                                                                                                             ?>" class="button jwplimelight_edit">Edit</a></td>
-            <td><a href="<?php //echo $player->admin_url($this, 'copy');                                                                                                                                                           ?>" class="button jwplimelight_copy">Copy</a></td>
+           <!-- <td><a href="<?php //echo $entity->admin_url($this, 'edit');   ?>                                                                                                                                                                       
+            <td><a href="<?php //echo $entity->admin_url($this, 'copy');  ?>                                                                                                                                                                      
             <td>
             <?php if ($entity->entity_id): ?>
-                                                                                                                                                                                                                    <a href="<?php //echo $player->admin_url($this, 'delete');                                                                                                                                     ?>" class="button jwplimelight_delete">Delete</a>
             <?php endif; ?>
             </td>-->
         </tr>
@@ -676,21 +527,6 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
     }
 
     protected function render_overview_entity_row($entity) {
-        /* $description = $player->get('description');
-          if ($description) {
-          if ($this->imported_players && array_key_exists($description, $this->imported_players)) {
-          $description .= " <em>(imported JW5 player)</em>";
-          }
-          } else {
-          $description = "<em>no description</em>";
-          }
-          if ('NULL' == $player->get('aspectratio') || null === $player->get('aspectratio')) {
-          $player_size = $player->get('width') . " x " . $player->get('height');
-          } else {
-          $player_size = "Responsive (" . $player->get('aspectratio') . ")";
-          } */
-        //echo '<br> -- $entity ';
-        // var_dump($entity);
         ?>
         <tr valign="middle">
             <td align="center">
@@ -701,46 +537,11 @@ class MVVLIVERAIL_Admin_Page_Default extends MVVLIVERAIL_Admin_Page {
             <td><?php echo $entity->organization; ?></td>
             <td><?php echo $entity->parent_id; ?></td>
             <td><?php echo $entity->type; ?></td>
-            <td><a href="<?php //echo $player->admin_url($this, 'edit');                                                                                                                                                             ?>" class="button jwplimelight_edit">Edit</a></td>
-            <td><a href="<?php //echo $player->admin_url($this, 'copy');                                                                                                                                                           ?>" class="button jwplimelight_copy">Copy</a></td>
+            <td><a href="<?php //echo $entity->admin_url($this, 'edit'); ?>" class="button mvvliverail_edit">Edit</a></td>
+            <td><a href="<?php //echo $entity->admin_url($this, 'copy');  ?>" class="button mvvliverail_copy">Copy</a></td>
             <td>
                 <?php if ($entity->entity_id): ?>
-                    <a href="<?php //echo $player->admin_url($this, 'delete');                                                                                                                                    ?>" class="button jwplimelight_delete">Delete</a>
-                <?php endif; ?>
-            </td>
-        </tr>
-        <?php
-    }
-
-    protected function render_overview_row($player) {
-        $description = $player->get('description');
-        if ($description) {
-            if ($this->imported_players && array_key_exists($description, $this->imported_players)) {
-                $description .= " <em>(imported JW5 player)</em>";
-            }
-        } else {
-            $description = "<em>no description</em>";
-        }
-        if ('NULL' == $player->get('aspectratio') || null === $player->get('aspectratio')) {
-            $player_size = $player->get('width') . " x " . $player->get('height');
-        } else {
-            $player_size = "Responsive (" . $player->get('aspectratio') . ")";
-        }
-        ?>
-        <tr valign="middle">
-            <td align="center">
-                <strong>
-                    <?php echo $player->get_id(); ?>
-                </strong>
-            </td>
-            <td><?php echo $description; ?></td>
-            <td><?php echo $player_size; ?></td>
-            <td><?php echo $player->get('primary'); ?></td>
-            <td><a href="<?php echo $player->admin_url($this, 'edit'); ?>" class="button jwplimelight_edit">Edit</a></td>
-            <td><a href="<?php echo $player->admin_url($this, 'copy'); ?>" class="button jwplimelight_copy">Copy</a></td>
-            <td>
-                <?php if ($player->get_id()): ?>
-                    <a href="<?php echo $player->admin_url($this, 'delete'); ?>" class="button jwplimelight_delete">Delete</a>
+                    <a href="<?php //echo $entity->admin_url($this, 'delete');  ?>" class="button mvvliverail_delete">Delete</a>
                 <?php endif; ?>
             </td>
         </tr>

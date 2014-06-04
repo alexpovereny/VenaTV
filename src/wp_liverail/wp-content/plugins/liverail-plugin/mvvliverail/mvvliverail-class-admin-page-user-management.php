@@ -12,9 +12,9 @@ class MVVLIVERAIL_Admin_Page_User_Management extends MVVLIVERAIL_Admin_Page {
 
     protected function render_page_start($title) {
         ?>
-        <div id="wpbody-content" class="jwplimelight">
+        <div id="wpbody-content" class="mvvliverail">
             <div class="wrap">
-                <div id="icon-jwplimelight-main" class="icon32"></div>
+                <div id="icon-mvvliverail-main" class="icon32"></div>
                 <h2><?php echo $title; ?></h2>
                 <?php
             }
